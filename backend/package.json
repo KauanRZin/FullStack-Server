@@ -1,0 +1,31 @@
+{
+  "name": "fullstack-server",
+  "version": "1.0.0",
+  "description": "um sistema base fullstack",
+  "homepage": "https://github.com/KauanRZin/FullStack-Server#readme",
+  "bugs": {
+    "url": "https://github.com/KauanRZin/FullStack-Server/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KauanRZin/FullStack-Server.git"
+  },
+  "license": "ISC",
+  "author": "kauan",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@prisma/client": "^5.22.0",
+    "nodemon": "^3.0.1",
+    "prisma": "^5.22.0"
+  },
+  "scripts": {
+    "test": "node src/server.js",
+    "start": ""
+  }
+}

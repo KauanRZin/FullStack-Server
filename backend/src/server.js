@@ -1,0 +1,40 @@
+const express = require('express')
+const cors = require('cors')
+const prisma = require('./database/prisma.js')
+
+const app = express()
+const PORT = process.env.PORT || 4000
+
+app.use(cors())
+app.use(express.json())
+
+// rota de health check — testa se o servidor e o banco estão vivos
+app.get('/health', async (req, res) => {
+  try {
+    await prisma.$runCommandRaw({ ping: 1 })
+    res.json({
+      status: 'ok',
+      server: 'online',
+      database: 'conectado',
+    })
+  } catch (err) {
+    res.status(500).json({
+      status: 'erro',
+      server: 'online',
+      database: 'desconectado',
+      error: err.message,
+    })
+  }
+})
+
+// fecha o prisma corretamente quando o servidor desligar
+process.on('SIGINT', async () => {
+  await prisma.$disconnect()
+  console.log('Prisma desconectado. Servidor encerrado.')
+  process.exit(0)
+})
+
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`)
+  console.log(`Health check: http://localhost:${PORT}/health`)
+})
