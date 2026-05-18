@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ─── ROLES ──────────────────────────────────────────
+enum Role {
+  CUSTOMER
+  MANAGER
+  SUPER_ADMIN
+}
+
+// ─── STATUS DO PEDIDO ───────────────────────────────
+enum OrderStatus {
+  PENDING      // recebido, aguardando
+  PREPARING    // na cozinha
+  OUT_FOR_DELIVERY // saiu pra entrega
+  DELIVERED    // entregue
+  CANCELLED    // cancelado
+}
+// ─── STATUS DO USUARIO ───────────────────────────────
+enum UserStatus {
+  ACTIVE    
+  SUSPEND
+  INATIVE 
+}
+// ─── USER ───────────────────────────────────────────
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  status    UserStatus @default(ACTIVE)
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      Role     @default(CUSTOMER)
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+}
+
+// ─── CATEGORY ───────────────────────────────────────
+model Category {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String    @unique  // ex: Pizza, Bebida, Sobremesa, Bordas
+  createdAt DateTime  @default(now())
+
+  products  Product[]
+}
+
+// ─── PRODUCT ────────────────────────────────────────
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  price       Float
+  imageUrl    String?
+  available   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId  String   @db.ObjectId
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  orderItems  OrderItem[]
+}
+
+// ─── ORDER ──────────────────────────────────────────
+model Order {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  status       OrderStatus @default(PENDING)
+  total        Float
+  address      String
+  note         String?     // observações do cliente
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  userId       String      @db.ObjectId
+  user         User        @relation(fields: [userId], references: [id])
+
+  items        OrderItem[]
+}
+
+// ─── ORDER ITEM ─────────────────────────────────────
+model OrderItem {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  quantity     Int
+  priceAtTime  Float   // preço snapshot — congela o preço do momento
+
+  orderId      String  @db.ObjectId
+  order        Order   @relation(fields: [orderId], references: [id])
+
+  productId    String  @db.ObjectId
+  product      Product @relation(fields: [productId], references: [id])
+}

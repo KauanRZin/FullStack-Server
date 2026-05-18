@@ -9,7 +9,6 @@ node_modules/
 
 # Prisma — o client gerado é recriado com npm run db:generate
 backend/node_modules/.prisma/
-prisma
 # Docker
 .docker/
 
