@@ -27,6 +27,24 @@ app.get('/health', async (req, res) => {
   }
 })
 
+app.get('/', async (req, res) => {
+  try {
+    await prisma.$runCommandRaw({ ping: 1 })
+    res.json({
+      status: 'ok',
+      server: 'online',
+      database: 'conectado',
+    })
+  } catch (err) {
+    res.status(500).json({
+      status: 'erro',
+      server: 'online',
+      database: 'desconectado',
+      error: err.message,
+    })
+  }
+})
+
 // fecha o prisma corretamente quando o servidor desligar
 process.on('SIGINT', async () => {
   await prisma.$disconnect()
