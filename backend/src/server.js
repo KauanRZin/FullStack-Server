@@ -2,6 +2,14 @@ const express = require('express')
 const cors = require('cors')
 const prisma = require('./database/prisma.js')
 
+const errorHandler = require('./middleware/errorHandler') //caso haja algum erro
+
+//rotas
+const userRoute = ('./routes/user.js')
+const productRoute = ('./routes/user.js')
+const orderRoute = ('./routes/user.js')
+const categoryRoute = ('./routes/user.js')
+
 const app = express()
 const PORT = process.env.PORT 
 
@@ -18,12 +26,7 @@ app.get('/health', async (req, res) => {
       database: 'conectado',
     })
   } catch (err) {
-    res.status(500).json({
-      status: 'erro',
-      server: 'online',
-      database: 'desconectado',
-      error: err.message,
-    })
+    res.status()
   }
 })
 
@@ -47,3 +50,5 @@ app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)
   console.log(`Health check: http://localhost:${PORT}/health`)
 })
+
+app.use(errorHandler)
