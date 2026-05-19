@@ -7,9 +7,11 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-
+//paraa compatilibidade com o linux para o docker rodar
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"] 
+
 }
 
 // ─── ROLES ──────────────────────────────────────────

@@ -30,18 +30,9 @@ app.get('/health', async (req, res) => {
 app.get('/', async (req, res) => {
   try {
     await prisma.$runCommandRaw({ ping: 1 })
-    res.json({
-      status: 'ok',
-      server: 'online',
-      database: 'conectado',
-    })
+    res.send("TUDO CERTO BOY !!!")
   } catch (err) {
-    res.status(500).json({
-      status: 'erro',
-      server: 'online',
-      database: 'desconectado',
-      error: err.message,
-    })
+    res.send("TUDO DEU BOSTA !!!")
   }
 })
 
