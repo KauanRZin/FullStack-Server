@@ -1,7 +1,7 @@
 FROM node:20-alpine AS dev 
 WORKDIR /app
 RUN apk add --no-cache openssl
-COPY package*.json ./
+COPY backend/package*.json ./
 RUN npm install
 COPY . .
 CMD ["npm", "run", "dev"]
