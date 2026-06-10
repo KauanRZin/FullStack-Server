@@ -10,8 +10,8 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - PORT=4000
-      - DATABASE_URL=mongodb://pizzauser:pizzaria123@192.168.1.10:27017/pizzaria?authSource=pizzaria
+      - PORT=${PORT}
+      - DATABASE_URL=${DATABASE_URL}
     restart: unless-stopped
 
 networks:
