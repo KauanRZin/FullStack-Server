@@ -14,5 +14,5 @@ RUN npm install --omit=dev
 COPY backend/prisma ./prisma
 RUN npx prisma generate
 COPY backend/ ./
-CMD ["npm", "start"]
+CMD ["node", "src/server.js"]
 
