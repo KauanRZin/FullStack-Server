@@ -11,6 +11,7 @@ WORKDIR /app
 RUN apk add --no-cache openssl
 COPY backend/package*.json ./
 RUN npm install --omit=dev
+COPY backend/prisma ./prisma
 RUN npx prisma generate
 COPY . .
 CMD ["npm", "start"]
