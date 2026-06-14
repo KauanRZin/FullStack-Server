@@ -8,7 +8,7 @@ const findAll = async () => {
 
 const findById = async (id) => {
   return prisma.category.findUnique({
-    where: { id },
+    where: { id: Number(id) },
     include: { products: true }
   })
 }
@@ -18,11 +18,11 @@ const create = async ({ name }) => {
 }
 
 const update = async (id, { name }) => {
-  return prisma.category.update({ where: { id }, data: { name } })
+  return prisma.category.update({ where: { id: Number(id) }, data: { name } })
 }
 
 const remove = async (id) => {
-  return prisma.category.delete({ where: { id } })
+  return prisma.category.delete({ where: { id: Number(id) } })
 }
 
 module.exports = { findAll, findById, create, update, remove }

@@ -1,18 +1,20 @@
-FROM node:20-alpine AS dev 
-WORKDIR /app
+FROM node:20-alpine AS dev
+WORKDIR /app/backend
 RUN apk add --no-cache openssl
 COPY backend/package*.json ./
 RUN npm install
-COPY . .
+COPY backend/prisma ./prisma
+RUN npx prisma generate
+COPY backend/src ./src
 CMD ["npm", "run", "dev"]
 
 FROM node:20-alpine AS prod
-WORKDIR /app
+WORKDIR /app/backend
 RUN apk add --no-cache openssl
 COPY backend/package*.json ./
 RUN npm install --omit=dev
 COPY backend/prisma ./prisma
 RUN npx prisma generate
 COPY backend/ ./
-CMD ["sh", "-c", "echo 'inicio' && ls /app && node src/server.js"]
+CMD ["npm", "run", "start"]
 

@@ -21,7 +21,7 @@ const findByStatus = async (status) => {
 
 const findById = async (id) => {
   return prisma.order.findUnique({
-    where: { id },
+    where: { id: Number(id) },
     include: {
       user: { select: { id: true, name: true, phone: true } },
       items: { include: { product: true } }
@@ -31,7 +31,7 @@ const findById = async (id) => {
 
 const findByUser = async (userId) => {
   return prisma.order.findMany({
-    where: { userId },
+    where: { userId: Number(userId) },
     include: { items: { include: { product: true } } },
     orderBy: { createdAt: 'desc' }
   })
@@ -40,7 +40,7 @@ const findByUser = async (userId) => {
 const createWithItems = async ({ userId, address, note, items }) => {
   // calcula o total somando preço × quantidade de cada item
   const products = await prisma.product.findMany({
-    where: { id: { in: items.map(i => i.productId) } }
+    where: { id: { in: items.map(i => Number(i.productId)) } }
   })
 
   const total = items.reduce((sum, item) => {
@@ -51,7 +51,7 @@ const createWithItems = async ({ userId, address, note, items }) => {
   // cria o pedido e os itens numa única transação
   return prisma.order.create({
     data: {
-      userId,
+      userId: Number(userId),
       address,
       note,
       total,
@@ -71,15 +71,15 @@ const createWithItems = async ({ userId, address, note, items }) => {
 }
 
 const update = async (id, data) => {
-  return prisma.order.update({ where: { id }, data })
+  return prisma.order.update({ where: { id: Number(id) }, data })
 }
 
 const updateStatus = async (id, status) => {
-  return prisma.order.update({ where: { id }, data: { status } })
+  return prisma.order.update({ where: { id: Number(id) }, data: { status } })
 }
 
 const remove = async (id) => {
-  return prisma.order.delete({ where: { id } })
+  return prisma.order.delete({ where: { id: Number(id) } })
 }
 
 module.exports = { findAll,findByStatus, findById, findByUser,createWithItems,update, updateStatus }

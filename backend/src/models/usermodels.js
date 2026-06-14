@@ -20,7 +20,7 @@ const findByStatus = async (status) => {
 }
 
 const findById = async (id)=>{
-    return prisma.user.findUnique({where: {id}})
+    return prisma.user.findUnique({where: {id: Number(id)}})
 }
 
 const findByEmail = async (email)=>{
@@ -38,18 +38,18 @@ const create  = async({name, email, pwd,phone, role,status})=>{
 }
 
 const update = async (id, data) => {
-  return prisma.user.update({ where: { id }, data })
+  return prisma.user.update({ where: { id: Number(id) }, data })
 }
 
 const updateStatus = async (id, status) => {
   return prisma.user.update({
-    where: { id },
+    where: { id: Number(id) },
     data: { status }
   })
 }
 
 const remove = async(id) =>{
-    return prisma.user.delete({ where: { id } })
+    return prisma.user.delete({ where: { id: Number(id) } })
 }
 
 module.exports = { findAll,findAllActive,findByStatus, findById, findByEmail,register, create, update, updateStatus , remove}

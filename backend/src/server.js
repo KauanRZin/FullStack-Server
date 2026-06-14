@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const prisma = require('./database/prisma.js')
@@ -9,13 +10,12 @@ const errorHandler = require('./middleware/errorHandle')
 
 //rotas
 const userRoute = require('./routes/user.js')
-/* Ainda não implementado
-const productRoute = ('./routes/user.js')
-const orderRoute = ('./routes/useSr.js')
-const categoryRoute = ('./routes/user.js')
-*/
+const productRoute = require('./routes/product.js')
+const categoryRoute = require('./routes/category.js')
+const orderRoute = require('./routes/order.js')
+const authRoute = require('./routes/auth.js')
 const app = express()
-const PORT = process.env.PORT 
+const PORT = process.env.PORT || 4000
 
 app.use(cors())
 app.use(express.json())
@@ -24,67 +24,18 @@ const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'API de Usuários',
+            title: 'API FullStack - Gerenciamento de Pedidos',
             version: '1.0.0',
-            description: 'Documentação da API para gerenciamento de usuários (MongoDB + Prisma)',
+            description: 'API completa para gerenciamento de usuários, produtos, categorias e pedidos (PostgreSQL + Prisma)',
         },
         servers: [
             {
-                url: 'http://localhost:4000', // A sua porta configurada
+                url: 'http://localhost:4000',
                 description: 'Servidor Local'
             },
         ],
-        // Aqui nós escrevemos a documentação em JavaScript Puro, sem quebras por espaços!
-        paths: {
-            '/users': {
-                get: {
-                    summary: 'Retorna todos os usuários',
-                    tags: ['Users'],
-                    responses: {
-                        '200': { description: 'Lista de usuários obtida com sucesso' }
-                    }
-                }
-            },
-            '/users/register': {
-                post: {
-                    summary: 'Registra um novo usuário',
-                    tags: ['Users'],
-                    requestBody: {
-                        required: true,
-                        content: {
-                            'application/json': {
-                                schema: {
-                                    type: 'object',
-                                    properties: {
-                                        name: { 
-                                            type: 'string', 
-                                            example: 'Kauan' 
-                                        },
-                                        email: { 
-                                            type: 'string', 
-                                            example: 'kauan@exemplo.com' 
-                                        },
-                                        pwd: { 
-                                            type: 'string', 
-                                            example: 'senhaSegura123' 
-                                        },
-                                        phone: { 
-                                            type: 'string', 
-                                            example: '81999999999' 
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    responses: {
-                        '201': { description: 'Criado com sucesso' }
-                    }
-                }
-            }
-        }
     },
-    apis: [], // DEIXE VAZIO. Isso impede a biblioteca de ler arquivos e dar aquele erro fatal.
+    apis: ['./src/routes/*.js'],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
@@ -92,11 +43,15 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
 app.use('/users', userRoute)
+app.use('/products', productRoute)
+app.use('/categories', categoryRoute)
+app.use('/orders', orderRoute)
+app.use('/auth', authRoute)
 
 // rota de health check — testa se o servidor e o banco estão vivos
 app.get('/health', async (req, res) => {
   try {
-    await prisma.$runCommandRaw({ ping: 1 })
+    await prisma.$queryRaw`SELECT 1`
     res.json({
       status: 'ok',
       server: 'online',
@@ -134,7 +89,6 @@ app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)
   console.log(`Health check: http://localhost:${PORT}/health`)
   console.log(`Swagger em :http://localhost:${PORT}/api-docs`)
-
 })
 
 app.use(errorHandler)
