@@ -1,17 +1,13 @@
-// This is your Prisma schema file,
+// This is your Prisma schema file for PostgreSQL
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-//paraa compatilibidade com o linux para o docker rodar
+
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x"] 
-
 }
 
 // ─── ROLES ──────────────────────────────────────────
@@ -23,37 +19,40 @@ enum Role {
 
 // ─── STATUS DO PEDIDO ───────────────────────────────
 enum OrderStatus {
-  PENDING      // recebido, aguardando
-  PREPARING    // na cozinha
+  PENDING          // recebido, aguardando
+  PREPARING        // na cozinha
   OUT_FOR_DELIVERY // saiu pra entrega
-  DELIVERED    // entregue
-  CANCELLED    // cancelado
+  DELIVERED        // entregue
+  CANCELLED        // cancelado
 }
+
 // ─── STATUS DO USUARIO ───────────────────────────────
 enum UserStatus {
-  ACTIVE    
+  ACTIVE
   SUSPEND
-  INATIVE 
+  INATIVE
 }
+
 // ─── USER ───────────────────────────────────────────
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        Int        @id @default(autoincrement())
   status    UserStatus @default(ACTIVE)
   name      String
-  email     String   @unique
+  email     String     @unique
   password  String
   phone     String?
-  role      Role     @default(CUSTOMER)
+  role      Role       @default(CUSTOMER)
   address   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  
   orders    Order[]
 }
 
 // ─── CATEGORY ───────────────────────────────────────
 model Category {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  name      String    @unique  // ex: Pizza, Bebida, Sobremesa, Bordas
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
   createdAt DateTime  @default(now())
 
   products  Product[]
@@ -61,7 +60,7 @@ model Category {
 
 // ─── PRODUCT ────────────────────────────────────────
 model Product {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          Int      @id @default(autoincrement())
   name        String
   description String?
   price       Float
@@ -70,37 +69,37 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  categoryId  String   @db.ObjectId
-  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   orderItems  OrderItem[]
 }
 
 // ─── ORDER ──────────────────────────────────────────
 model Order {
-  id           String      @id @default(auto()) @map("_id") @db.ObjectId
-  status       OrderStatus @default(PENDING)
-  total        Float
-  address      String
-  note         String?     // observações do cliente
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id        Int         @id @default(autoincrement())
+  status    OrderStatus @default(PENDING)
+  total     Float
+  address   String
+  note      String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
-  userId       String      @db.ObjectId
-  user         User        @relation(fields: [userId], references: [id])
+  userId    Int
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  items        OrderItem[]
+  items     OrderItem[]
 }
 
 // ─── ORDER ITEM ─────────────────────────────────────
 model OrderItem {
-  id           String  @id @default(auto()) @map("_id") @db.ObjectId
-  quantity     Int
-  priceAtTime  Float   // preço snapshot — congela o preço do momento
+  id         Int     @id @default(autoincrement())
+  quantity   Int
+  priceAtTime Float
 
-  orderId      String  @db.ObjectId
-  order        Order   @relation(fields: [orderId], references: [id])
+  orderId    Int
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  productId    String  @db.ObjectId
-  product      Product @relation(fields: [productId], references: [id])
+  productId  Int
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
