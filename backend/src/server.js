@@ -7,6 +7,8 @@ const swaggerJsDoc = require('swagger-jsdoc')
 const swaggerUi = require('swagger-ui-express')
 
 const errorHandler = require('./middleware/errorHandle') 
+const authMiddleware = require('./middleware/auth');
+
 
 //rotas
 const userRoute = require('./routes/user.js')
@@ -34,6 +36,16 @@ const swaggerOptions = {
                 description: 'Servidor Local'
             },
         ],
+         components: {
+            securitySchemes: {
+                bearerAuth: {          // ← nome do scheme
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                }
+            }
+        },
+        security: [{ bearerAuth: [] }],
     },
     apis: ['./src/routes/*.js'],
 };
@@ -42,10 +54,10 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
-app.use('/users', userRoute)
-app.use('/products', productRoute)
-app.use('/categories', categoryRoute)
-app.use('/orders', orderRoute)
+app.use('/users',authMiddleware, userRoute)
+app.use('/products',authMiddleware, productRoute)
+app.use('/categories',authMiddleware, categoryRoute)
+app.use('/orders',authMiddleware, orderRoute)
 app.use('/auth', authRoute)
 
 // rota de health check — testa se o servidor e o banco estão vivos
@@ -62,22 +74,13 @@ app.get('/health', async (req, res) => {
   }
 })
 
-app.get('/', async (req, res) => {
-  try {
-    await prisma.$runCommandRaw({ ping: 1 })
-    res.send("TUDO CERTO BOY !!!")
-  } catch (err) {
-    res.send("TUDO DEU BOSTA !!!")
-  }
-})
-
 app.use((req, res, next) => {
     const error = new Error('Rota não encontrada');
     error.status = 404;
     next(error); // Passa o erro para o middleware abaixo
 });
 
-app.use(errorHandler)
+
 // fecha o prisma corretamente quando o servidor desligar
 process.on('SIGINT', async () => {
   await prisma.$disconnect()

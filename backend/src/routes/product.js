@@ -1,6 +1,7 @@
 const ex = require('express');
 var router = ex.Router();
 var productModel = require('../models/productmodels');
+const authorize = require('../middleware/authorize');
 
 /**
  * @swagger

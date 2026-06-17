@@ -1,35 +1,22 @@
 const ex = require('express');
 var router = ex.Router();
 var categoryModel = require('../models/categorymodels');
+const authorize = require('../middleware/authorize');
 
 /**
  * @swagger
  * /categories:
  *   get:
- *     summary: 📂 Listar todas as categorias
+ *     summary: Listar todas as categorias
  *     description: Retorna a lista de todas as categorias de produtos com a contagem de itens em cada uma.
  *     tags:
  *       - Categories
  *     responses:
  *       200:
  *         description: Lista de categorias obtida com sucesso
- */
-// GET - Listar todas as categorias
-router.get("/", async (req, res, next) => {
-  try {
-    const categories = await categoryModel.findAll();
-    res.status(200).json(categories);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * @swagger
- * /categories:
  *   post:
- *     summary: ➡️ Criar nova categoria
- *     description: Cria uma categoria de produtos. Ex: Pizzas, Bebidas, Sobremesas.
+ *     summary: Criar nova categoria
+ *     description: Cria uma categoria de produtos. Ex Pizzas, Bebidas, Sobremesas.
  *     tags:
  *       - Categories
  *     requestBody:
@@ -48,8 +35,18 @@ router.get("/", async (req, res, next) => {
  *       400:
  *         description: Nome da categoria é obrigatório
  */
+// GET - Listar todas as categorias
+router.get("/", async (req, res, next) => {
+  try {
+    const categories = await categoryModel.findAll();
+    res.status(200).json(categories);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // POST - Criar nova categoria
-router.post("/", async (req, res, next) => {
+router.post("/",  authorize("SUPER_ADMIN", "MANAGER"), async (req, res, next) => {
   try {
     const { name } = req.body;
     
@@ -130,7 +127,7 @@ router.get("/:id", async (req, res, next) => {
  *         description: Categoria atualizada com sucesso
  */
 // PATCH - Atualizar categoria
-router.patch("/:id", async (req, res, next) => {
+router.patch("/:id", authorize("SUPER_ADMIN", "MANAGER"), async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
@@ -169,7 +166,7 @@ router.patch("/:id", async (req, res, next) => {
  *         description: Categoria não encontrada
  */
 // DELETE - Remover categoria
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id",authorize("SUPER_ADMIN", "MANAGER"), async (req, res, next) => {
   try {
     const { id } = req.params;
     const category = await categoryModel.findById(id);

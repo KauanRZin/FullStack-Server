@@ -1,4 +1,7 @@
 const ex = require('express');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 var router = ex.Router();
 var userModel = require('../models/usermodels');
 
@@ -46,16 +49,21 @@ router.post("/login", async (req, res, next) => {
             return next(erro);
         }
         
-        // Comparação simples de senha (sem hash)
-        // Em produção, use bcrypt ou similar
-        if (user.password !== pwd) {
+        const passwordIsValid = await bcrypt.compare(pwd, user.password)
+        if (!passwordIsValid) {
             const erro = new Error('Senha incorreta.');
             erro.status = 401;
             return next(erro);
         }
+        const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+        );
         
         res.status(200).json({
             message: 'Login realizado com sucesso',
+            token,
             user: {
                 id: user.id,
                 name: user.name,

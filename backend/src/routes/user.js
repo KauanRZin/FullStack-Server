@@ -1,4 +1,5 @@
 const ex = require('express');
+const authorize = require('../middleware/authorize');
 var router = ex.Router();
 var userModel = require('../models/usermodels');
 
@@ -60,7 +61,8 @@ router.get("/", async(req,res,next) =>{
  *       201:
  *         description: Usuário criado com sucesso
  */
-router.post("/", async (req, res, next) => {
+router.post("/",  authorize("SUPER_ADMIN"), async (req, res, next) => {
+    
     try {
         const { name, email, pwd, phone, role, status } = req.body;
         

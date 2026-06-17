@@ -186,7 +186,7 @@ router.post("/", async (req, res, next) => {
  * /orders/{id}/status:
  *   patch:
  *     summary: 🔄 Atualizar status do pedido
- *     description: Muda o status de um pedido (ex: PENDING → PREPARING → OUT_FOR_DELIVERY → DELIVERED).
+ *     description: "Muda o status de um pedido (ex: PENDING → PREPARING → OUT_FOR_DELIVERY → DELIVERED)."
  *     tags:
  *       - Orders
  *     parameters:
