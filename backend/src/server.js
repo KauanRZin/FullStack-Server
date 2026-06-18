@@ -50,10 +50,6 @@ if (process.env.NODE_ENV !== 'production') {
   console.log(`Swagger em: http://localhost:${PORT}/api-docs`)
 }
 
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
-
 app.use('/users',authMiddleware, userRoute)
 app.use('/products',authMiddleware, productRoute)
 app.use('/categories',authMiddleware, categoryRoute)
