@@ -20,8 +20,8 @@ API RESTful para gerenciamento de pedidos, produtos, categorias e usuários — 
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/seu-repo.git
-cd seu-repo
+git clone https://github.com/KauanRZin/FullStack-Server
+cd FullStack-Server
 ```
 
 ### 2. Configure as variáveis de ambiente
