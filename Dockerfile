@@ -6,4 +6,4 @@ RUN npm install
 COPY backend/prisma ./prisma
 RUN npx prisma generate
 COPY backend/ ./
-CMD ["npm", "run", "start"]
+CMD sh -c "npx prisma migrate deploy && node prisma/seed.js && npm run start"
