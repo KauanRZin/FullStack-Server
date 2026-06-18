@@ -20,7 +20,9 @@ const PORT = process.env.PORT || 4000
 app.use(cors())
 app.use(express.json())
 
+// ─── Swagger apenas em desenvolvimento ────────────────────────
 if (process.env.NODE_ENV !== 'production') {
+  const path = require('path') 
   const swaggerJsDoc = require('swagger-jsdoc')
   const swaggerUi = require('swagger-ui-express')
 
@@ -32,19 +34,10 @@ if (process.env.NODE_ENV !== 'production') {
         version: '1.0.0',
         description: 'API completa para gerenciamento de usuários, produtos, categorias e pedidos (PostgreSQL + Prisma)',
       },
-      servers: [
-        {
-          url: 'http://localhost:4000',
-          description: 'Servidor Local'
-        },
-      ],
+      servers: [{ url: 'http://localhost:4000', description: 'Servidor Local' }],
       components: {
         securitySchemes: {
-          bearerAuth: {
-            type: 'http',
-            scheme: 'bearer',
-            bearerFormat: 'JWT',
-          }
+          bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }
         }
       },
       security: [{ bearerAuth: [] }],
