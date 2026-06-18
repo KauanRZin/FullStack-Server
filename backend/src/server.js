@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== 'production') {
         version: '1.0.0',
         description: 'API completa para gerenciamento de usuários, produtos, categorias e pedidos (PostgreSQL + Prisma)',
       },
-      servers: [{ url: 'http://localhost:4000', description: 'Servidor Local' }],
+      servers: [{ url: process.env.API_URL ||'http://localhost:4000', description: 'Servidor Local' }],
       components: {
         securitySchemes: {
           bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }
