@@ -29,17 +29,16 @@ cd FullStack-Server
 Crie um arquivo `.env` na raiz do projeto com base no `.env.example`:
 
 ```env
-DATABASE_URL="postgresql://pizzaria_user:1234@db:5432/pizzaria"
+DATABASE_URL="postgresql://pizzaria_user:1234@SEUUSUARIO:5432/SEUBANCO"
 
 PORT=4000
 NODE_ENV=development
 
 JWT_SECRET="sua_chave_secreta_aqui"
-JWT_EXPIRES_IN=1h
+JWT_EXPIRES_IN=SUA HORA
 
 SUPER_ADMIN_EMAIL=admin@pizzaria.com
 SUPER_ADMIN_PASSWORD=SuaSenhaAqui123!
-SUPER_ADMIN_PHONE=00000000000
 ```
 
 ### 3. Suba os containers
