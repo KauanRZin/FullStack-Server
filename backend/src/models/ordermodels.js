@@ -3,7 +3,11 @@ const prisma = require('../database/prisma')
 //admin
 const findAll = async ()=> {
     return prisma.order.findMany({
-        select: {id:true,total:true,address:true,note:true,userId:true,items:true,status:true, createdAt: true,updatedAt:true}
+        include: {
+            user: { select: { id: true, name: true, phone: true } },
+            items: { include: { product: true } }
+        },
+        orderBy: { createdAt: 'desc' }
     })
 }
 
