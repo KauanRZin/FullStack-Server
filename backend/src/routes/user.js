@@ -2,6 +2,8 @@ const ex = require('express');
 const authorize = require('../middleware/authorize');
 var router = ex.Router();
 var userModel = require('../models/usermodels');
+const validateLength = require('../middleware/validation')
+
 
 /**
  * @swagger
@@ -15,7 +17,7 @@ var userModel = require('../models/usermodels');
  *       200:
  *         description: Lista de usuários obtida com sucesso
  */
-router.get("/", async(req,res,next) =>{
+router.get("/",authorize("SUPER_ADMIN"),async(req,res,next) =>{
     try{
         const users = await userModel.findAll();
         res.status(200).json(users);
@@ -61,7 +63,7 @@ router.get("/", async(req,res,next) =>{
  *       201:
  *         description: Usuário criado com sucesso
  */
-router.post("/",  authorize("SUPER_ADMIN"), async (req, res, next) => {
+router.post("/",authorize("SUPER_ADMIN"), async (req, res, next) => {
     
     try {
         const { name, email, pwd, phone, role, status } = req.body;
@@ -71,7 +73,12 @@ router.post("/",  authorize("SUPER_ADMIN"), async (req, res, next) => {
             erro.status = 400;
             return next(erro);
         }
-        
+        // valida tamanho de cada campo
+        validateLength('name',  name)
+        validateLength('email', email)
+        validateLength('pwd',   pwd)
+        validateLength('phone', phone)
+
         const userExists = await userModel.findByEmail(email);
         if (userExists) {
             const erro = new Error('Email já cadastrado.');
@@ -98,7 +105,7 @@ router.post("/",  authorize("SUPER_ADMIN"), async (req, res, next) => {
  *       200:
  *         description: Lista de usuários ativos obtida com sucesso
  */
-router.get("/active" , async(req,res,next)=>{
+router.get("/active" ,authorize("SUPER_ADMIN", "MANAGER"), async(req,res,next)=>{
     try{
         const users = await userModel.findAllActive();
         res.status(200).json(users);
@@ -170,7 +177,11 @@ router.get("/:id", async(req,res,next) =>{
 router.patch('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
-        const data = req.body;
+        const { name, email, phone, address } = req.body;
+        if (name)    validateLength('name',    name)
+        if (email)   validateLength('email',   email)
+        if (phone)   validateLength('phone',   phone)
+        if (address) validateLength('address', address)
         const updatedUser = await userModel.update(id, data);
         res.status(200).json(updatedUser);
     } catch (error) {

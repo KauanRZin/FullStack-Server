@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 
 var router = ex.Router();
 var userModel = require('../models/usermodels');
+const validateLength = require('../middleware/validation')
 
 /**
  * @swagger
@@ -44,14 +45,14 @@ router.post("/login", async (req, res, next) => {
         
         const user = await userModel.findByEmail(email);
         if (!user) {
-            const erro = new Error('Email não encontrado.');
+            const erro = new Error('Email não encontrado ou Senha incorreta.');
             erro.status = 401;
             return next(erro);
         }
         
         const passwordIsValid = await bcrypt.compare(pwd, user.password)
         if (!passwordIsValid) {
-            const erro = new Error('Senha incorreta.');
+            const erro = new Error('Email não encontrado ou Senha incorreta.');
             erro.status = 401;
             return next(erro);
         }
@@ -114,6 +115,16 @@ router.post("/login", async (req, res, next) => {
 router.post("/register", async (req, res, next) => {
     try {
         const { name, email, pwd, phone } = req.body;
+        if (!name || !email || !pwd) {
+            const erro = new Error('Nome, email e senha são obrigatórios.');
+            erro.status = 400;
+            return next(erro);
+        }
+        validateLength('name',  name)
+        validateLength('email', email)
+        validateLength('pwd',   pwd)
+        validateLength('phone', phone)
+
         const userExists = await userModel.findByEmail(email);
         if (userExists) {
             const erro = new Error('Email já cadastrado.');
