@@ -16,7 +16,7 @@ const authorize = require('../middleware/authorize');
  *         description: Lista de produtos obtida com sucesso
  */
 // GET - Listar todos os produtos
-router.get("/", async (req, res, next) => {
+router.get("/",authorize("SUPER_ADMIN" , "MANAGER"), async (req, res, next) => {
   try {
     const products = await productModel.findAll();
     res.status(200).json(products);
@@ -148,7 +148,7 @@ router.get("/:id", async (req, res, next) => {
  *         description: Nome, preço e categoria são obrigatórios
  */
 // POST - Criar novo produto
-router.post("/", async (req, res, next) => {
+router.post("/",authorize("SUPER_ADMIN" , "MANAGER"), async (req, res, next) => {
   try {
     const { name, description, price, imageUrl, categoryId, available } = req.body;
     
@@ -191,7 +191,7 @@ router.post("/", async (req, res, next) => {
  *         description: Produto atualizado com sucesso
  */
 // PATCH - Atualizar produto
-router.patch("/:id", async (req, res, next) => {
+router.patch("/:id",authorize("SUPER_ADMIN" , "MANAGER") ,async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
@@ -228,7 +228,7 @@ router.patch("/:id", async (req, res, next) => {
  *         description: Produto não encontrado
  */
 // DELETE - Remover produto
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id",authorize("SUPER_ADMIN" , "MANAGER"), async (req, res, next) => {
   try {
     const { id } = req.params;
     const product = await productModel.findById(id);
