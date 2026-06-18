@@ -20,26 +20,30 @@ API RESTful para gerenciamento de pedidos, produtos, categorias e usuários — 
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/KauanRZin/FullStack-Server
-cd FullStack-Server
+git clone https://github.com/seu-usuario/seu-repo.git
+cd seu-repo
 ```
 
 ### 2. Configure as variáveis de ambiente
 
-Crie um arquivo `.env` na raiz do projeto com base no `.env.example`:
+Crie um arquivo `.env` na raiz do projeto. Todas as variáveis abaixo são obrigatórias:
 
 ```env
-DATABASE_URL="postgresql://pizzaria_user:1234@SEUUSUARIO:5432/SEUBANCO"
+# ─── Banco de dados ───────────────────────────────────────────
+# Não altere o host "db" — é o nome do serviço no docker-compose
+DATABASE_URL="postgresql://pizzaria_user:1234@db:5432/pizzaria"
 
-PORT=4000
-NODE_ENV=development
+# ─── JWT ──────────────────────────────────────────────────────
+# Gere uma chave segura com: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+JWT_SECRET="cole_sua_chave_gerada_aqui"
+JWT_EXPIRES_IN=1h   # ex: 1h, 7d, 30d
 
-JWT_SECRET="sua_chave_secreta_aqui"
-JWT_EXPIRES_IN=SUA HORA
-
+# ─── Super Admin (usado apenas no seed) ───────────────────────
 SUPER_ADMIN_EMAIL=admin@pizzaria.com
-SUPER_ADMIN_PASSWORD=SuaSenhaAqui123!
+SUPER_ADMIN_PASSWORD=SuaSenhaForte123!
 ```
+
+> **Dica:** o `DATABASE_URL` usa o host `db` porque é o nome do container no Docker Compose. Se rodar fora do Docker, troque por `localhost`.
 
 ### 3. Suba os containers
 
@@ -108,8 +112,8 @@ Authorization: Bearer <seu_token>
 | Método | Rota | Descrição | Acesso |
 |--------|------|-----------|--------|
 | GET | `/users` | Listar todos os usuários | SUPER_ADMIN |
-| GET | `/users/active` | Listar usuários ativos | SUPER_ADMIN |
-| GET | `/users/:id` | Buscar usuário por ID | SUPER_ADMIN |
+| GET | `/users/active` | Listar usuários ativos | SUPER_ADMIN. MANAGER |
+| GET | `/users/:id` | Buscar usuário por ID | Autenticado |
 | POST | `/users` | Criar usuário (admin/manager) | SUPER_ADMIN |
 | PATCH | `/users/:id` | Atualizar dados do usuário | SUPER_ADMIN |
 | PATCH | `/users/:id/status` | Alterar status do usuário | SUPER_ADMIN |
@@ -127,7 +131,7 @@ Authorization: Bearer <seu_token>
 ### 🍕 Products
 | Método | Rota | Descrição | Acesso |
 |--------|------|-----------|--------|
-| GET | `/products` | Listar todos os produtos | Autenticado |
+| GET | `/products` | Listar todos os produtos | SUPER_ADMIN |
 | GET | `/products/available` | Listar produtos disponíveis | Autenticado |
 | GET | `/products/category/:categoryId` | Produtos por categoria | Autenticado |
 | GET | `/products/:id` | Buscar produto por ID | Autenticado |
