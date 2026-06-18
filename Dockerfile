@@ -1,0 +1,9 @@
+FROM node:20-alpine AS prod
+WORKDIR /app/backend
+RUN apk add --no-cache openssl
+COPY package*.json ./
+RUN npm install --omit=dev
+COPY prisma ./prisma
+RUN npx prisma generate
+COPY . .
+CMD ["npm", "run", "start"]
