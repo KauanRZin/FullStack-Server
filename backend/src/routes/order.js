@@ -1,6 +1,8 @@
 const ex = require('express');
 var router = ex.Router();
 var orderModel = require('../models/ordermodels');
+const authorize = require('../middleware/authorize');
+
 
 /**
  * @swagger
@@ -15,7 +17,7 @@ var orderModel = require('../models/ordermodels');
  *         description: Lista de pedidos obtida com sucesso
  */
 // GET - Listar todos os pedidos (admin)
-router.get("/", async (req, res, next) => {
+router.get("/", authorize("SUPER_ADMIN" , "MANAGER"), async (req, res, next) => {
   try {
     const orders = await orderModel.findAll();
     res.status(200).json(orders);
@@ -44,7 +46,7 @@ router.get("/", async (req, res, next) => {
  *         description: Pedidos encontrados com esse status
  */
 // GET - Listar pedidos por status
-router.get("/status/:status", async (req, res, next) => {
+router.get("/status/:status",authorize("SUPER_ADMIN" , "MANAGER"), async (req, res, next) => {
   try {
     const { status } = req.params;
     const orders = await orderModel.findByStatus(status);
@@ -210,7 +212,7 @@ router.post("/", async (req, res, next) => {
  *         description: Status atualizado com sucesso
  */
 // PATCH - Atualizar status do pedido
-router.patch("/:id/status", async (req, res, next) => {
+router.patch("/:id/status",authorize("SUPER_ADMIN" , "MANAGER"), async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;

@@ -17,7 +17,7 @@ const validateLength = require('../middleware/validation')
  *       200:
  *         description: Lista de usuários obtida com sucesso
  */
-router.get("/",authorize("SUPER_ADMIN"),async(req,res,next) =>{
+router.get("/", authorize("SUPER_ADMIN"), async(req,res,next) =>{
     try{
         const users = await userModel.findAll();
         res.status(200).json(users);

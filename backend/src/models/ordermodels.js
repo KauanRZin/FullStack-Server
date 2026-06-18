@@ -3,7 +3,7 @@ const prisma = require('../database/prisma')
 //admin
 const findAll = async ()=> {
     return prisma.order.findMany({
-        select: {id:true,total:true,address:true,note:true,userid:true,items:true,status:true, createdAt: true,updatedAt:true}
+        select: {id:true,total:true,address:true,note:true,userId:true,items:true,status:true, createdAt: true,updatedAt:true}
     })
 }
 
@@ -82,4 +82,4 @@ const remove = async (id) => {
   return prisma.order.delete({ where: { id: Number(id) } })
 }
 
-module.exports = { findAll,findByStatus, findById, findByUser,createWithItems,update, updateStatus }
+module.exports = { findAll,findByStatus, findById, findByUser,createWithItems,update, updateStatus, remove }
