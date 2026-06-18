@@ -37,6 +37,10 @@ const findByUser = async (userId) => {
 }
 
 const createWithItems = async ({ userId, address, note, items }) => {
+    // DEBUG TEMPORÁRIO — remova depois de identificar o problema.
+    // Mostra exatamente o que chegou no body, antes de qualquer conversão.
+    console.log('[DEBUG] items recebidos (brutos):', JSON.stringify(items))
+
     // normaliza productId para number UMA vez, logo no início, e reaproveita
     // essa versão normalizada em todas as comparações/gravações abaixo.
     // Antes: items.map(i => Number(i.productId)) só era usado na busca (findMany),
@@ -47,10 +51,14 @@ const createWithItems = async ({ userId, address, note, items }) => {
         productId: Number(item.productId),
     }))
 
+    console.log('[DEBUG] items normalizados:', JSON.stringify(normalizedItems))
+
     // calcula o total somando preço × quantidade de cada item
     const products = await prisma.product.findMany({
         where: { id: { in: normalizedItems.map(i => i.productId) } }
     })
+
+    console.log('[DEBUG] produtos encontrados no banco:', JSON.stringify(products.map(p => ({ id: p.id, name: p.name }))))
 
     // valida que todo productId enviado realmente existe, com mensagem clara
     // em vez de quebrar mais na frente com erro genérico
