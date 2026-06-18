@@ -2,9 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const prisma = require('./database/prisma.js')
-const swaggerJsDoc = require('swagger-jsdoc')
 
-const swaggerUi = require('swagger-ui-express')
 
 const errorHandler = require('./middleware/errorHandle') 
 const authMiddleware = require('./middleware/auth');
@@ -22,33 +20,42 @@ const PORT = process.env.PORT || 4000
 app.use(cors())
 app.use(express.json())
 
-const swaggerOptions = {
+if (process.env.NODE_ENV !== 'production') {
+  const swaggerJsDoc = require('swagger-jsdoc')
+  const swaggerUi = require('swagger-ui-express')
+
+  const swaggerOptions = {
     definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'API FullStack - Gerenciamento de Pedidos',
-            version: '1.0.0',
-            description: 'API completa para gerenciamento de usuários, produtos, categorias e pedidos (PostgreSQL + Prisma)',
+      openapi: '3.0.0',
+      info: {
+        title: 'API FullStack - Gerenciamento de Pedidos',
+        version: '1.0.0',
+        description: 'API completa para gerenciamento de usuários, produtos, categorias e pedidos (PostgreSQL + Prisma)',
+      },
+      servers: [
+        {
+          url: 'http://localhost:4000',
+          description: 'Servidor Local'
         },
-        servers: [
-            {
-                url: 'http://localhost:4000',
-                description: 'Servidor Local'
-            },
-        ],
-         components: {
-            securitySchemes: {
-                bearerAuth: {          // ← nome do scheme
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT',
-                }
-            }
-        },
-        security: [{ bearerAuth: [] }],
+      ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          }
+        }
+      },
+      security: [{ bearerAuth: [] }],
     },
-    apis: ['./src/routes/*.js'],
-};
+    apis: [path.join(__dirname, './routes/*.js')],
+  }
+
+  const swaggerDocs = swaggerJsDoc(swaggerOptions)
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+  console.log(`Swagger em: http://localhost:${PORT}/api-docs`)
+}
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
